@@ -11,7 +11,7 @@ android {
         applicationId = "com.huluwa.nativeapp"
         // 默认包最低支持 Android 8；
         // Android 5-7 兼容包用 -PHONGGUOTV_MIN_SDK=21 出 android5 变体
-        minSdk = findProperty("HONGGUOTV_MIN_SDK")?.toString()?.toInt() ?: 26
+        minSdk = findProperty("HONGGUOTV_MIN_SDK")?.toString()?.toInt() ?: 21
         targetSdk = 36
         // 界面为中文；保留中英文库资源，其余语言沿用默认文案。
         resourceConfigurations += listOf("zh", "en")
