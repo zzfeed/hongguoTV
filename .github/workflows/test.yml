@@ -13,17 +13,21 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v7
 
-      # 第一步：JDK17 用来跑系统gradle生成wrapper（gradle9需要jdk17）
-      - name: Set up JDK 17 for wrapper gen
+      # 第一步：JDK17 用于运行系统gradle生成wrapper
+      - name: Set up JDK 17 for wrapper generate
         uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Generate Gradle Wrapper 7.5
-        run: gradle wrapper --gradle-version 7.5
+      # 【重点！修改这里的cd路径！】进入有settings.gradle的目录，生成wrapper
+      - name: Generate Gradle Wrapper 7.5 inside project dir
+        run: |
+          cd kotlin-tv
+          gradle wrapper --gradle-version 7.5
+          chmod +x gradlew
 
-      # 切换回JDK11，项目编译要用JDK11
+      # 切换JDK11，项目编译需要JDK11
       - name: Set up JDK 11 for build
         uses: actions/setup-java@v5
         with:
@@ -31,10 +35,8 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: 全局阿里云镜像
+      # 全局阿里云镜像，解决依赖拉取超时
+      - name: Aliyun mirror init script
         run: |
           mkdir -p ~/.gradle
           cat > ~/.gradle/init.gradle <<'EOF'
@@ -52,9 +54,13 @@ jobs:
           }
           EOF
 
+      # 编译，同样cd进入工程目录
       - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+         cd kotlin-tv
+          ./gradlew assembleDebug --stacktrace
 
+      # 上传apk，路径也要对应
       - name: Upload Debug APK
         uses: actions/upload-artifact@v7
         with:
