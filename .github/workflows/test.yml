@@ -13,22 +13,31 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v7
 
-      - name: Set up JDK 17
+      # 先JDK17，用来运行下载的gradle7.6生成wrapper
+      - name: Set up JDK 17 for wrapper gen
         uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 下载 Gradle 8.4（修复multi-release jar的bug）
-      - name: Download Gradle 8.4
+      # 下载 Gradle 7.6（7系列最终稳定版，适配AGP7）
+      - name: Download Gradle 7.6
         run: |
-          wget https://mirrors.cloud.tencent.com/gradle/gradle-8.4-all.zip
-          unzip gradle-8.4-all.zip
-          export GRADLE_HOME=$PWD/gradle-8.4
+          wget https://mirrors.cloud.tencent.com/gradle/gradle-7.6-all.zip
+          unzip gradle-7.6-all.zip
+          export GRADLE_HOME=$PWD/gradle-7.6
           export PATH=$GRADLE_HOME/bin:$PATH
           cd kotlin-tv
-          gradle wrapper --gradle-version 8.4
+          gradle wrapper --gradle-version 7.6
           chmod +x gradlew
+
+      # 切换JDK11，AGP7编译必须JDK11
+      - name: Set up JDK 11 for build
+        uses: actions/setup-java@v5
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: gradle
 
       # 阿里云全局镜像
       - name: Aliyun mirror init script
@@ -49,7 +58,7 @@ jobs:
           }
           EOF
 
-      # 打包，清空缓存+clean+强制刷新依赖
+      # 清理缓存 + clean + 强制刷新依赖
       - name: Build Debug APK
         run: |
           rm -rf ~/.gradle/caches
