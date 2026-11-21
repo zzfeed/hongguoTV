@@ -1,11 +1,20 @@
-pluginManagement {
+settingsEvaluated { settings ->
+settings.pluginManagement {
 repositories {
 maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
 maven { url 'https://maven.aliyun.com/repository/google' }
 maven { url 'https://maven.aliyun.com/repository/public' }
+google(); mavenCentral(); gradlePluginPortal() } 
 }
 }
-pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
+}
+allprojects {
+repositories {
+maven { url 'https://maven.aliyun.com/repository/google' }
+maven { url 'https://maven.aliyun.com/repository/public' }
+}
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
