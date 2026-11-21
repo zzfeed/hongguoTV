@@ -13,20 +13,28 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v7
 
-      - name: Set up JDK 11
+      # 第一步：JDK17 用来跑系统gradle生成wrapper（gradle9需要jdk17）
+      - name: Set up JDK 17 for wrapper gen
+        uses: actions/setup-java@v5
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Generate Gradle Wrapper 7.5
+        run: gradle wrapper --gradle-version 7.5
+
+      # 切换回JDK11，项目编译要用JDK11
+      - name: Set up JDK 11 for build
         uses: actions/setup-java@v5
         with:
           java-version: '11'
           distribution: 'temurin'
           cache: gradle
 
-      # 重点：没有gradlew，先初始化gradle wrapper
-      - name: Generate Gradle Wrapper
-        run: |
-          gradle wrapper --gradle-version 7.5
-          chmod +x gradlew
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-      - name: 写入全局gradle镜像配置
+      - name: 全局阿里云镜像
         run: |
           mkdir -p ~/.gradle
           cat > ~/.gradle/init.gradle <<'EOF'
