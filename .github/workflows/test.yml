@@ -19,15 +19,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 下载Gradle8.2，生成wrapper
-      - name: Download Gradle 8.2
+      # 下载 Gradle 8.4（修复multi-release jar的bug）
+      - name: Download Gradle 8.4
         run: |
-          wget https://mirrors.cloud.tencent.com/gradle/gradle-8.2-all.zip
-          unzip gradle-8.2-all.zip
-          export GRADLE_HOME=$PWD/gradle-8.2
+          wget https://mirrors.cloud.tencent.com/gradle/gradle-8.4-all.zip
+          unzip gradle-8.4-all.zip
+          export GRADLE_HOME=$PWD/gradle-8.4
           export PATH=$GRADLE_HOME/bin:$PATH
           cd kotlin-tv
-          gradle wrapper --gradle-version 8.2
+          gradle wrapper --gradle-version 8.4
           chmod +x gradlew
 
       # 阿里云全局镜像
@@ -49,7 +49,7 @@ jobs:
           }
           EOF
 
-      # 重点：清缓存 + clean + 强制刷新依赖
+      # 打包，清空缓存+clean+强制刷新依赖
       - name: Build Debug APK
         run: |
           rm -rf ~/.gradle/caches
