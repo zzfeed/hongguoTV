@@ -13,21 +13,25 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v7
 
-      # JDK17 用来运行系统gradle生成wrapper
-      - name: Set up JDK 17 for wrapper generate
+      # 配置JDK17，用来运行我们手动下载的gradle 7.5
+      - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # 进入 kotlin-tv 目录生成 wrapper
-      - name: Generate Gradle Wrapper 7.5 inside kotlin-tv
+      # 手动下载gradle 7.5，不用系统自带的gradle9！
+      - name: Download Gradle 7.5
         run: |
+          wget https://mirrors.aliyun.com/maven/gradle/gradle-7.5-all.zip
+          unzip gradle-7.5-all.zip
+          export GRADLE_HOME=$PWD/gradle-7.5
+          export PATH=$GRADLE_HOME/bin:$PATH
           cd kotlin-tv
           gradle wrapper --gradle-version 7.5
           chmod +x gradlew
 
-      # 切换JDK11编译项目
+      # 切换JDK11，项目编译用
       - name: Set up JDK 11 for build
         uses: actions/setup-java@v5
         with:
@@ -54,13 +58,13 @@ jobs:
           }
           EOF
 
-      # 在 kotlin-tv 目录执行打包
+      # 打包
       - name: Build Debug APK
         run: |
           cd kotlin-tv
           ./gradlew assembleDebug --stacktrace
 
-      # APK路径：kotlin-tv 里面的app模块输出
+      # 上传APK
       - name: Upload Debug APK
         uses: actions/upload-artifact@v7
         with:
