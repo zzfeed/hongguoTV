@@ -1,9 +1,7 @@
-settingsEvaluated { settings ->
+
 settings.pluginManagement {
 repositories {
-maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
-maven { url 'https://maven.aliyun.com/repository/google' }
-maven { url 'https://maven.aliyun.com/repository/public' }
+
 google(); mavenCentral(); gradlePluginPortal() } 
 }
 }
