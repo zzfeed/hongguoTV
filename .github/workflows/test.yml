@@ -20,16 +20,32 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Replace maven to aliyun mirror
+      # 重点：没有gradlew，先初始化gradle wrapper
+      - name: Generate Gradle Wrapper
         run: |
-          sed -i 's/maven { url "https:\/\/maven.google.com" }/maven { url "https:\/\/maven.aliyun.com\/repository\/google" }/' settings.gradle
-          sed -i 's/mavenCentral()/maven { url "https:\/\/maven.aliyun.com\/repository\/public" }/' settings.gradle
+          gradle wrapper --gradle-version 7.5
+          chmod +x gradlew
+
+      - name: 写入全局gradle镜像配置
+        run: |
+          mkdir -p ~/.gradle
+          cat > ~/.gradle/init.gradle <<'EOF'
+          allprojects {
+              repositories {
+                  maven { url 'https://maven.aliyun.com/repository/google' }
+                  maven { url 'https://maven.aliyun.com/repository/public' }
+                  maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+              }
+          }
+          pluginManagement {
+              repositories {
+                  maven { url 'https://maven.aliyun.com/repository/gradle-plugin' }
+              }
+          }
+          EOF
 
       - name: Build Debug APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v7
