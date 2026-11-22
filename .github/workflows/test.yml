@@ -26,8 +26,10 @@ jobs:
         with:
           packages: platform-tools
 
-      - name: Install SDK components
-        run: sdkmanager --yes 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.1.12297006'
+      - name: Accept licenses and install SDK components
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.1.12297006'
 
       - name: Cache Gradle
         uses: actions/cache@v4
@@ -64,5 +66,3 @@ jobs:
             kotlin-tv/app/build/reports/tests/testDebugUnitTest/
             kotlin-tv/app/build/reports/lint-results-debug.*
             kotlin-tv/app/build/outputs/apk/debug/*.apk
-            # 如果你确认没有 build/platform 输出，下面这行删掉
-            # kotlin-tv/app/build/platform/outputs/apk/debug/*.apk
